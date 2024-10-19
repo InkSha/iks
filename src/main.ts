@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import { Constructor, Controller, Get, HttpMethod, Module, Post } from './decorator';
+import { Constructor, Controller, Get, HttpMethod, Module, Param, Post } from './decorator';
 import { TokenConfig } from './token';
 import * as express from 'express';
 
@@ -15,10 +15,12 @@ class AppController {
   }
 
   @Get('login')
-  public async Login () {
+  public async Login (@Param('name') name: string, @Param('pwd') pwd: string) {
     return {
       code: 200,
-      data: 'login'
+      data: 'login',
+      name,
+      pwd
     }
   }
 }
@@ -40,16 +42,30 @@ const parseController = (controller: Constructor) => {
   const entityMethodNames = Object.getOwnPropertyNames(controller.prototype).filter(name => name !== 'constructor')
 
   for (const name of entityMethodNames) {
-    const url = Reflect.getMetadata(TokenConfig.Router, controller.prototype[name]) as string
-    const method = Reflect.getMetadata(TokenConfig.RouterMethod, controller.prototype[name]) as HttpMethod
-    const fn = controller.prototype[name]
+    const fn = controller.prototype[name] as (...args: any[]) => any
+    const url = Reflect.getMetadata(TokenConfig.Router, fn) as string
+    const method = Reflect.getMetadata(TokenConfig.RouterMethod, fn) as HttpMethod
+    const params = Reflect.getMetadata(TokenConfig.Params, fn)
 
     router[method](join(baseUrl, url), (req, res) => {
       new Promise(async (resolve, reject) => {
+        const p = []
+
+        if (params) {
+          p.push(
+            ...new Array(Math.max(...params.map(v => v.index)))
+          )
+          for (const { type, index, prototype } of params) {
+            if (type === 'params') {
+              p[index] = req.query[prototype]
+            }
+          }
+        }
+
         if (isAsyncFn(fn)) {
-          resolve(await fn())
+          resolve(await fn(...p))
         } else {
-          resolve(fn())
+          resolve(fn(...p))
         }
       })
         .then(data => {
@@ -66,7 +82,9 @@ const f = (module: Constructor) => {
 
   const config = Reflect.getMetadata(TokenConfig.Moudle, module)
   for (const controller of config.controllers) {
-    app.use(parseController(controller))
+    app.use(
+      parseController(controller)
+    )
   }
 
   app.listen(3000, () => {

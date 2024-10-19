@@ -28,6 +28,17 @@ export const Put = GenerateRouter(HttpMethod.Put)
 export const Patch = GenerateRouter(HttpMethod.Patch)
 export const Delete = GenerateRouter(HttpMethod.Delete)
 
+export type Param = (prototype?: string) => ParameterDecorator
+export const Param: Param = (prototype?: string) => (target, key, index) => {
+  const data = Reflect.getMetadata(TokenConfig.Params, target[key]) ?? []
+  data.push({
+    type: 'params',
+    index,
+    prototype
+  })
+  Reflect.defineMetadata(TokenConfig.Params, data, target[key])
+}
+
 export type Constructor = (new (...args: any[]) => any)
 export type Module = (config?: {
   controllers: Constructor[]
