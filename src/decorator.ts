@@ -2,8 +2,13 @@ import { TokenConfig } from './token'
 
 export type Controller = (baseUrl?: string) => ClassDecorator
 export const Controller: Controller = baseUrl => target => {
+
+  baseUrl ??= '/'
+
+  if (!baseUrl.startsWith('/')) baseUrl = '/' + baseUrl
+
   Reflect.defineMetadata(TokenConfig.Controller, {
-    baseUrl: baseUrl ?? '/',
+    baseUrl,
     proto: target
   }, target)
 }

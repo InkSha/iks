@@ -3,7 +3,7 @@ import { Constructor, Controller, Get, HttpMethod, Module, Param, Post } from '.
 import { TokenConfig } from './token';
 import * as express from 'express';
 
-@Controller()
+@Controller('user')
 class AppController {
 
   @Get('home')
@@ -15,7 +15,10 @@ class AppController {
   }
 
   @Get('login')
-  public async Login (@Param('name') name: string, @Param('pwd') pwd: string) {
+  public async Login (
+    @Param('name') name: string,
+    @Param('pwd') pwd: string
+  ) {
     return {
       code: 200,
       data: 'login',
@@ -47,7 +50,8 @@ const parseController = (controller: Constructor) => {
     const method = Reflect.getMetadata(TokenConfig.RouterMethod, fn) as HttpMethod
     const params = Reflect.getMetadata(TokenConfig.Params, fn)
 
-    router[method](join(baseUrl, url), (req, res) => {
+    const path = join(baseUrl, url)
+    router[method](path, (req, res) => {
       new Promise(async (resolve, reject) => {
         const p = []
 
