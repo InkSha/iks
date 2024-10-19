@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "outDir": "dist",
+    "target": "ESNext",
+    "allowSyntheticDefaultImports": true,
+    "lib": [
+      "ESNext"
+    ],
+    "types": [
+      "node",
+      "reflect-metadata"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+  }
+}
