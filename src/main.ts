@@ -1,5 +1,5 @@
 
-import { Controller, Get, Module, Param } from './decorator';
+import { Controller, Get, Injectable, Module, Param } from './decorator';
 import { AppFactory } from './core';
 
 @Controller('user')
@@ -27,9 +27,21 @@ class AppController {
   }
 }
 
+@Injectable()
+class AppService {
+
+}
+
 @Module({
-  controllers: [AppController]
+  controllers: [AppController],
+  providers: [AppService]
 })
 class AppModule {}
 
-AppFactory(AppModule)
+const boostrap = () => {
+  const app = AppFactory(AppModule)
+
+  app.start()
+}
+
+boostrap()

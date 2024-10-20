@@ -63,7 +63,12 @@ export const AppFactory = (module: Constructor) => {
     )
   }
 
-  app.listen(3000, () => {
-    console.log('run')
-  })
+
+  return {
+    start: () => {
+      app.listen(3000, () => {
+        console.log('run')
+      })
+    }
+  }
 }

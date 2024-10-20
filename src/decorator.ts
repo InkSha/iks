@@ -45,10 +45,21 @@ export const Param: Param = (prototype?: string) => (target, key, index) => {
 }
 
 export type Constructor = (new (...args: any[]) => any)
-export type Module = (config?: {
-  controllers: Constructor[]
-}) => ClassDecorator
+export type ModuleConfig = {
+  controllers: Constructor[],
+  providers: Constructor[]
+}
+export type Module = (config?: Partial<ModuleConfig>) => ClassDecorator
 
 export const Module: Module = config => target => {
+  config ??= {}
+  config.controllers ??= []
+  config.providers ??= []
+
   Reflect.defineMetadata(TokenConfig.Moudle, config, target)
+}
+
+export type Injectable = () => ClassDecorator
+export const Injectable: Injectable = () => target => {
+  Reflect.defineMetadata(TokenConfig.Injectable, true, target)
 }
