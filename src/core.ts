@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import * as express from 'express'
-import { Constructor, HttpMethod } from './decorator'
+import { Constructor, HttpMethod, NotFoundError } from './decorator'
 import { TokenConfig } from './token'
 
 export * from './decorator'
@@ -59,6 +59,7 @@ export class AppFactory {
       const url = Reflect.getMetadata(TokenConfig.Router, fn) as string
       const method = Reflect.getMetadata(TokenConfig.RouterMethod, fn) as HttpMethod
       const params = Reflect.getMetadata(TokenConfig.Params, fn)
+      const statusCode = Reflect.getMetadata(TokenConfig.HttpStatus, fn)
 
       const path = this.join(baseUrl, url)
       router[method](path, (req, res) => {
@@ -76,12 +77,33 @@ export class AppFactory {
             }
           }
 
-          if (this.isAsyncFn(fn)) {
-            resolve(await fn.call(entity, ...p))
-          } else {
-            resolve(fn.call(entity, ...p))
+          try {
+            if (this.isAsyncFn(fn)) {
+              resolve(await fn.call(entity, ...p))
+            } else {
+              resolve(fn.call(entity, ...p))
+            }
+          }
+          catch (e: unknown) {
+            if (e instanceof NotFoundError) {
+              res.status(e.code)
+              resolve({
+                code: e.code,
+                msg: e.message,
+                name: e.name
+              })
+            } else {
+              resolve('unknow error')
+            }
           }
         })
+          .then(data => {
+            if (statusCode) {
+              res.status(statusCode)
+            }
+
+            return data
+          })
           .then(data => {
             res.send(data)
           })

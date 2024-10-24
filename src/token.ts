@@ -4,5 +4,6 @@ export const TokenConfig = {
   RouterMethod: "__Router_Method__",
   Moudle: "__Module__",
   Params: "__Params__",
-  Injectable: "__INJECTABLE__"
+  Injectable: "__INJECTABLE__",
+  HttpStatus: "__HTTP_STATUS__"
 } as const satisfies Record<string, `__${string}__`>

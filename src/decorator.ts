@@ -60,3 +60,26 @@ export type Injectable = () => ClassDecorator
 export const Injectable: Injectable = () => target => {
   Reflect.defineMetadata(TokenConfig.Injectable, true, target)
 }
+
+export enum HttpStatusCode {
+  Success = 200,
+  NotFound = 404
+}
+
+type HttpCode = () => MethodDecorator
+type GenerateHttpCode = (code: HttpStatusCode) => HttpCode
+const GenerateHttpCode: GenerateHttpCode = code => () => (target, key, descriptor) => {
+  Reflect.defineMetadata(TokenConfig.HttpStatus, code, target[key])
+}
+
+export const Success = GenerateHttpCode(HttpStatusCode.Success)
+export const NotFound = GenerateHttpCode(HttpStatusCode.NotFound)
+
+export class NotFoundError extends Error {
+  public code = HttpStatusCode.NotFound
+
+  constructor(message: string) {
+    super(message)
+    this.name = 'NotFoundAssets'
+  }
+}

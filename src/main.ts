@@ -1,5 +1,5 @@
 
-import { Controller, Get, Injectable, Module, Param } from './decorator'
+import { Controller, Get, Injectable, Module, NotFound, NotFoundError, Param } from './decorator'
 import { AppFactory } from './core'
 
 @Injectable()
@@ -10,11 +10,18 @@ class AppService {
     console.log('service init')
   }
   public async login(name: string, pwd: string) {
+    if (name === 'error') {
+      return this.notFound()
+    }
     return (name === 'test' && pwd === '123')
   }
 
   public count() {
     return this._count++
+  }
+
+  public notFound() {
+    throw new NotFoundError('Not Found User!')
   }
 }
 
@@ -32,6 +39,16 @@ class AppController {
     return {
       code: 200,
       data: 'home'
+    }
+  }
+
+  @Get('not-found')
+  @NotFound()
+  public async NotFound() {
+    return {
+      code: 200,
+      data: null,
+      msg: 'not found'
     }
   }
 
@@ -64,6 +81,11 @@ class UserController {
     return {
       count: this.service.count()
     }
+  }
+
+  @Get('test-error')
+  public testError() {
+    return this.service.notFound()
   }
 }
 
