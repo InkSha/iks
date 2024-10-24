@@ -7,10 +7,7 @@ export const Controller: Controller = baseUrl => target => {
 
   if (!baseUrl.startsWith('/')) baseUrl = '/' + baseUrl
 
-  Reflect.defineMetadata(TokenConfig.Controller, {
-    baseUrl,
-    proto: target
-  }, target)
+  Reflect.defineMetadata(TokenConfig.Controller, baseUrl, target)
 }
 
 export enum HttpMethod {
