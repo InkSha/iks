@@ -78,10 +78,12 @@ export class AppFactory {
           }
 
           try {
-            if (this.isAsyncFn(fn)) {
-              resolve(await fn.call(entity, ...p))
+            const result = fn.call(entity, p)
+
+            if (result instanceof Promise) {
+              resolve(await result)
             } else {
-              resolve(fn.call(entity, ...p))
+              resolve(result)
             }
           }
           catch (e: unknown) {
@@ -113,16 +115,16 @@ export class AppFactory {
     return router
   }
 
-  private isAsyncFn(fn: Function) {
-    return fn.constructor.name === "AsyncFunction"
-  }
+  // private isAsyncFn(fn: Function) {
+  //   return fn.constructor.name === "AsyncFunction"
+  // }
 
   private join(...urls: string[]) {
     return urls.map(url => url.replaceAll('\\', '/')).join('/').replace(/\/{2,}/g, '/')
   }
 
   public start() {
-    this.app.listen(3000, () => {
+    this.app.listen(3001, () => {
       console.log('run')
     })
   }

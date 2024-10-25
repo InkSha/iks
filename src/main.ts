@@ -66,6 +66,11 @@ class AppController {
       }
     })
   }
+
+  @Get('register')
+  public register() {
+    return Promise.resolve({ code: 200, data: 'register' })
+  }
 }
 
 @Controller('user')

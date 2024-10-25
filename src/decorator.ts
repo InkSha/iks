@@ -18,9 +18,9 @@ export enum HttpMethod {
   Delete = "delete"
 }
 export type Router = (url?: string) => MethodDecorator
-export type GenerateRouter = (type: HttpMethod) => Router
-export const GenerateRouter: GenerateRouter = type => url => (target, key, desciper) => {
-  Reflect.defineMetadata(TokenConfig.RouterMethod, type, target[key])
+export type GenerateRouter = (requestType: HttpMethod) => Router
+export const GenerateRouter: GenerateRouter = requestType => url => (target, key, desciper) => {
+  Reflect.defineMetadata(TokenConfig.RouterMethod, requestType, target[key])
   Reflect.defineMetadata(TokenConfig.Router, url, target[key])
 }
 
