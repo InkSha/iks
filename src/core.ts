@@ -25,20 +25,19 @@ export class AppFactory {
   }
 
   private toEntity(proto: Constructor, providers: Constructor[] = []) {
-
-    const params = []
-
-    try {
-      const args = Reflect.getMetadata('design:paramtypes', proto) as Constructor[]
-      params
-        .push(...(args).map(constructor => this.toEntity(constructor, providers))
-        )
-    }
-    catch {}
-
     if (this.entity.has(proto)) {
       return this.entity.get(proto)
     } else {
+      const params = []
+
+      try {
+        const args = Reflect.getMetadata('design:paramtypes', proto) as Constructor[]
+        params
+          .push(...(args).map(constructor => this.toEntity(constructor, providers))
+          )
+      }
+      catch {}
+
       const entity = new proto(...params)
 
       this.entity.set(proto, entity)
@@ -78,7 +77,7 @@ export class AppFactory {
           }
 
           try {
-            const result = fn.call(entity, p)
+            const result = fn.call(entity, ...p)
 
             if (result instanceof Promise) {
               resolve(await result)
