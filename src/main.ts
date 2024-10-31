@@ -1,5 +1,5 @@
 
-import { Controller, Get, Injectable, Module, NotFound, NotFoundError, Param } from './decorator'
+import { Controller, Get, Injectable, Module, NotFound, NotFoundException, Params } from './common'
 import { AppFactory } from './core'
 
 @Injectable()
@@ -21,7 +21,7 @@ class AppService {
   }
 
   public notFound() {
-    throw new NotFoundError('Not Found User!')
+    throw new NotFoundException('Not Found User!')
   }
 }
 
@@ -54,8 +54,8 @@ class AppController {
 
   @Get('login')
   public async Login(
-    @Param('name') name: string,
-    @Param('pwd') pwd: string
+    @Params('name') name: string,
+    @Params('pwd') pwd: string
   ) {
     return this.service.login(name, pwd).then(pass => {
       return {
