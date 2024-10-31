@@ -1,11 +1,18 @@
-import express from 'express'
-import { Constructor, HttpMethod, HTTPException, TokenConfig, HttpStatusCode, ParamsInfo, HttpParams } from '../common'
-import { getMetadata } from '@/shared'
+import {
+  type Constructor,
+  HTTPException,
+  type HttpMethod,
+  HttpParams,
+  HttpStatusCode,
+  type ParamsInfo,
+  TokenConfig,
+} from "@inksha/iks-common"
+import { getMetadata } from "@inksha/iks-shared"
+import express from "express"
 
 export class AppFactory {
-
   private readonly app = express()
-  private entity: Map<Constructor, Constructor> = new Map()
+  private entity: Map<Constructor, {}> = new Map()
 
   constructor(module: Constructor) {
     this.parseModule(module)
@@ -20,48 +27,38 @@ export class AppFactory {
   }
 
   private toEntity(proto: Constructor, providers: Constructor[] = []) {
-    if (this.entity.has(proto)) {
-      return this.entity.get(proto)
-    } else {
-      const params = []
+    if (this.entity.has(proto)) return this.entity.get(proto)
 
-      try {
-        const args = getMetadata('design:paramtypes', proto) as Constructor[]
-        params
-          .push(...(args).map(constructor => this.toEntity(constructor, providers))
-          )
-      }
-      catch {}
+    const params = []
 
-      const entity = new proto(...params)
+    try {
+      const args = getMetadata("design:paramtypes", proto) as Constructor[]
+      params.push(...args.map((fn) => this.toEntity(fn, providers)))
+    } catch {}
 
-      this.entity.set(proto, entity)
+    const entity = new proto(...params)
 
-      return entity
-    }
+    this.entity.set(proto, entity)
+
+    return entity
   }
 
   private parseController(controller: Constructor, providers?: Constructor[]) {
     const router = express.Router()
 
     const baseUrl = getMetadata(TokenConfig.Controller, controller)
-    const entityMethodNames = this.getMethodList(controller.prototype)
+    const entityMethodNames = this.getMethodList(controller)
     const entity = this.toEntity(controller, providers)
 
     for (const name of entityMethodNames) {
-
-      const {
-        fn, url, method, params, statusCode
-      } = this.parseRouterFnData(entity, name, baseUrl)
+      const { fn, url, method, params, statusCode } = this.parseRouterFnData(entity, name, baseUrl)
 
       router[method](url, async (req, res) => {
-
         const p = this.getParams(req, params)
-        const data = this.callHandle(fn, entity, p)
 
         if (statusCode) res.status(statusCode)
 
-        res.send(data)
+        this.callHandle(fn, entity, p).then((data) => res.send(data))
       })
     }
 
@@ -69,50 +66,46 @@ export class AppFactory {
   }
 
   private getMethodList = (entity: Constructor) => {
-    return Object.getOwnPropertyNames(entity.prototype).filter(name => name !== 'constructor')
+    return entity.prototype
+      ? Object.getOwnPropertyNames(entity.prototype).filter((name) => name !== "constructor")
+      : []
   }
 
   private getParams(req: express.Request, params?: ParamsInfo[]) {
     const p = []
 
     if (params) {
-      p.push(...new Array(Math.max(...params.map(v => v.index))))
+      p.push(...new Array(Math.max(...params.map((v) => v.index))))
       for (const { type, index, prototype } of params) {
-        p[index] = prototype
-          ? req[type][prototype]
-          : req[type]
+        p[index] = prototype ? req[type][prototype] : req[type]
       }
     }
 
     return p
   }
 
-  private async callHandle(fn: Function, caller: Object, params: any[]) {
+  private async callHandle(fn: Function, caller: Object, params: unknown[]) {
     const result = {
       code: HttpStatusCode.Success,
-      msg: 'Success',
-      data: null
+      msg: "Success",
+      data: null,
     }
     try {
       const data = fn.call(caller, ...params)
 
-      result.data = data instanceof Promise
-        ? await data
-        : data
-    }
-    catch (e: unknown) {
+      result.data = data instanceof Promise ? await data : data
+    } catch (e: unknown) {
       const isHTTPException = e instanceof HTTPException
 
       result.code = isHTTPException ? e.code : HttpStatusCode.ServerError
-      result.msg = isHTTPException ? e.message : 'unknown error'
+      result.msg = isHTTPException ? e.message : "unknown error"
     }
-    finally {
-      return result
-    }
+
+    return result
   }
 
-  private parseRouterFnData(entity: Constructor, name: string, baseUrl = '/') {
-    const fn = entity[name] as (...args: any[]) => any
+  private parseRouterFnData(entity: {}, name: string, baseUrl = "/") {
+    const fn = entity[name] as (...args: unknown[]) => unknown
     const url = this.join(baseUrl, getMetadata(TokenConfig.Router, fn) as string)
     const method = getMetadata(TokenConfig.RouterMethod, fn) as HttpMethod
     const params = getMetadata(TokenConfig.Params, fn) as ParamsInfo[]
@@ -122,12 +115,15 @@ export class AppFactory {
   }
 
   private join(...urls: string[]) {
-    return urls.map(url => url.replaceAll('\\', '/')).join('/').replace(/\/{2,}/g, '/')
+    return urls
+      .map((url) => url.replaceAll("\\", "/"))
+      .join("/")
+      .replace(/\/{2,}/g, "/")
   }
 
-  public start() {
-    this.app.listen(3001, () => {
-      console.log('run')
+  public start(port = 3000) {
+    this.app.listen(port, () => {
+      console.log("run")
     })
   }
 }

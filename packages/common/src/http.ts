@@ -3,17 +3,17 @@ export enum HttpMethod {
   Post = "post",
   Put = "put",
   Patch = "patch",
-  Delete = "delete"
+  Delete = "delete",
 }
 
 export enum HttpStatusCode {
-  Success = 200
+  Success = 200,
 }
 
 export enum HttpStatusCode {
-  NotFound = 404
+  NotFound = 404,
 }
 
 export enum HttpStatusCode {
-  ServerError = 500
+  ServerError = 500,
 }

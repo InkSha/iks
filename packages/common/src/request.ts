@@ -1,10 +1,10 @@
-import { defineMetadata, getMetadata } from '@/shared'
-import { TokenConfig } from './token'
+import { defineMetadata, getMetadata } from "@inksha/iks-shared"
+import { TokenConfig } from "./token"
 
 export enum HttpParams {
-  query = 'query',
-  params = 'params',
-  body = 'body'
+  query = "query",
+  params = "params",
+  body = "body",
 }
 
 export interface ParamsInfo {

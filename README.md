@@ -1,6 +1,6 @@
-# Simple Nest
+# IKS
 
-一个简易的 Nest.js。
+一个简易的仿造 Nest.js 的 NodeJS 后台框架。
 
 用于学习 IoC (Inversion of Control 控制反转) 和 DI (Dependency Injection 依赖注入) 思想。
 

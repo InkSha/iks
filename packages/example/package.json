@@ -1,0 +1,30 @@
+{
+  "name": "@inksha/iks-example",
+  "version": "0.0.0",
+  "description": "iks example",
+  "author": "inksha",
+  "homepage": "https://github.com/InkSha/iks#readme",
+  "license": "MIT",
+  "main": "src/index.ts",
+  "publishConfig": {
+    "registry": "https://registry.npmmirror.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/InkSha/iks.git",
+    "directory": "packages/example"
+  },
+  "scripts": {
+    "dev": "ts-node ./src/index.ts --watch",
+    "check": "biome check --fix",
+    "lint": "biome lint --fix",
+    "format": "biome format --fix"
+  },
+  "bugs": {
+    "url": "https://github.com/InkSha/iks/issues"
+  },
+  "dependencies": {
+    "@inksha/iks-common": "workspace:^",
+    "@inksha/iks-core": "workspace:^"
+  }
+}

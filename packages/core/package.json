@@ -1,0 +1,34 @@
+{
+  "name": "@inksha/iks-core",
+  "version": "0.0.0",
+  "description": "iks core",
+  "author": "inksha",
+  "homepage": "https://github.com/InkSha/iks#readme",
+  "license": "MIT",
+  "main": "src/index.ts",
+  "publishConfig": {
+    "registry": "https://registry.npmmirror.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/InkSha/iks.git",
+    "directory": "packages/core"
+  },
+  "scripts": {
+    "dev": "ts-node ./src/index.ts",
+    "check": "biome check --fix",
+    "lint": "biome lint --fix",
+    "format": "biome format --fix"
+  },
+  "bugs": {
+    "url": "https://github.com/InkSha/iks/issues"
+  },
+  "dependencies": {
+    "@inksha/iks-common": "workspace:^",
+    "@inksha/iks-shared": "workspace:^"
+  },
+  "peerDependencies": {
+    "@inksha/iks-common": "workspace:^",
+    "@inksha/iks-shared": "workspace:^"
+  }
+}

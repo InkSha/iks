@@ -5,5 +5,5 @@ export const TokenConfig = {
   Moudle: "__Module__",
   Params: "__Params__",
   Injectable: "__INJECTABLE__",
-  HttpStatus: "__HTTP_STATUS__"
+  HttpStatus: "__HTTP_STATUS__",
 } as const satisfies Record<string, `__${string}__`>
